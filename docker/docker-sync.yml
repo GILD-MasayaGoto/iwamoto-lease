@@ -1,0 +1,5 @@
+version: '2'
+syncs:
+  iwamoto-lease-volume:
+    src: ~/_projects/iwamoto-lease/src
+

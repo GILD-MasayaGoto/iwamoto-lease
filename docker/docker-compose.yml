@@ -1,0 +1,82 @@
+version: '3.5'
+
+services:
+  iwamoto-lease-web:
+    build: ./servers/web
+    container_name: "iwamoto-lease-web-server"
+    networks:
+      - container-link
+    ports:
+      - 55050:80
+      - 56050:443
+    depends_on:
+      - iwamoto-lease-node-client
+    volumes:
+      - iwamoto-lease-volume:/var/www/html/
+      - ./servers/web/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./servers/web/etc/nginx/ssl/:/etc/nginx/ssl/
+      - ./servers/web/var/log/nginx:/var/log/nginx/
+      - ./config/root/.bashrc:/root/.bashrc
+      - ./config/root/.vimrc:/root/.vimrc
+
+  iwamoto-lease-node-client:
+    build: ./servers/node
+    container_name: "iwamoto-lease-node-client-server"
+    networks:
+      - container-link
+    environment:
+      HOST: 0.0.0.0
+    ports:
+      - "57050:3000"
+    depends_on:
+      - iwamoto-lease-app
+    volumes:
+      - iwamoto-lease-volume:/var/www/html
+      - ./config/root/.bashrc:/root/.bashrc
+      - ./config/root/.vimrc:/root/.vimrc
+    working_dir: /var/www/html/iwamoto-lease-client
+    command: bash -c "yarn dev"
+
+  iwamoto-lease-app:
+    build: ./servers/app
+    container_name: "iwamoto-lease-app-server"
+    networks:
+      - container-link
+    ports:
+      - 58050:80
+    environment:
+      TZ: "Asia/Tokyo"
+    depends_on:
+      - iwamoto-lease-db
+    volumes:
+      - iwamoto-lease-volume:/var/www/html/
+      - ./servers/app/etc/php-fpm.d/:/etc/php-fpm.d/
+      - ./servers/app/etc/php.ini:/etc/php.ini
+      - ./servers/app/var/log/php-fpm:/var/log/php-fpm
+      - ./config/root/.bashrc:/root/.bashrc
+      - ./config/root/.vimrc:/root/.vimrc
+
+  iwamoto-lease-db:
+    build: ./servers/db
+    container_name: "iwamoto-lease-db-server"
+    networks:
+      - container-link
+    ports:
+      - "59050:3306"
+    env_file: ./config/.env
+    volumes:
+      - ./servers/db/docker-entrypoint-initdb.d/initial.sql:/docker-entrypoint-initdb.d/initial.sql
+      - ./servers/db/var/lib/mysql:/var/lib/mysql
+      - ./config/root/.bashrc:/root/.bashrc
+      - ./config/root/.vimrc:/root/.vimrc
+
+networks:
+  default:
+    external:
+      name: bridge
+  container-link:
+    name: iwamoto-lease
+
+volumes:
+  iwamoto-lease-volume:
+    external: true

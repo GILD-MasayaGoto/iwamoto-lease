@@ -1,0 +1,9 @@
+.DS_Store
+.idea
+composer.lock
+vendor/*
+.docker-sync/*
+servers/*/var/*
+server.crt
+server.key
+*docker-sync.sh
