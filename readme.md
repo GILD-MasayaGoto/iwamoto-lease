@@ -10,9 +10,9 @@ $ sudo vi /etc/hosts
 
 step2
 ```
-mkdir -p ~/_projects/iwamoto-lease
-cd ~/_projects/iwamoto-lease
-git clone git@github.com:GILD-MasayaGoto/iwamoto-lease.git docker
+mkdir -p ~/_projects/
+cd ~/_projects/
+git clone git@github.com:GILD-MasayaGoto/iwamoto-lease.git iwamoto-lease
 ```
 
 step3
